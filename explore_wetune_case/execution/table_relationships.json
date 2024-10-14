@@ -1,0 +1,40 @@
+{
+    "posts": {
+        "primary_key": "id",
+        "foreign_keys": [],
+        "referenced_by": [
+            {
+                "table": "topic_allowed_groups",
+                "column": "topic_id",
+                "references_column": "topic_id"
+            },
+            {
+                "table": "topic_allowed_users",
+                "column": "topic_id",
+                "references_column": "topic_id"
+            }
+        ]
+    },
+    "topic_allowed_groups": {
+        "primary_key": "id",
+        "foreign_keys": [
+            {
+                "column": "topic_id",
+                "references_table": "posts",
+                "references_column": "topic_id"
+            }
+        ],
+        "referenced_by": []
+    },
+    "topic_allowed_users": {
+        "primary_key": "id",
+        "foreign_keys": [
+            {
+                "column": "topic_id",
+                "references_table": "posts",
+                "references_column": "topic_id"
+            }
+        ],
+        "referenced_by": []
+    }
+}
