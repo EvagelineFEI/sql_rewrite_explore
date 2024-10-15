@@ -96,7 +96,7 @@ def parse_create_table(sql):
     columns = pattern.findall(sql)
     return columns
 
-def generate_random_data(column_type):
+def generate_random_data(column_type, unique='False'):
     fake = Faker()
     if column_type == 'int':
         return random.randint(1, 200)  # 随机生成整数
@@ -151,14 +151,12 @@ def insert_test_data_single(schema_sqls, num_rows): # 目前实现的这个版�
         if match:
             table_name = match.group(1)  # 提取表名
         else:
-            print("-------------match table name failed-----------")
-            
+            print("-------------match table name failed-----------")   
         unique_pattern = re.compile(r'UNIQUE\s*\((.*?)\)', re.IGNORECASE)
         matches = unique_pattern.findall(schema_sql)
-        unique_columns = [column.strip() for match in matches for column in match.split(',')]
+        unique_columns = [column.strip('`') for match in matches for column in match.split(',')]
         columns = parse_create_table(schema_sql)
-        
-        used_data = set()
+        used_data = []
         if len(table_relations[table_name]["referenced_by"]) != 0:    
             test_data = []
             constraintion=[entry for entry in table_relations[table_name]["referenced_by"]]
@@ -175,14 +173,13 @@ def insert_test_data_single(schema_sqls, num_rows): # 目前实现的这个版�
                         while unique and generated_value in used_data:
                             generated_value = generate_random_data(column_type, unique=unique)
                         if unique:
-                            used_data.add(generated_value)
+                            used_data.append(generated_value)
                         row[column_name] = generated_value
                         
                 test_data.append(row)  
 
             #
             core_column = [entry["references_column"] for entry in constraintion]
-            test_data = list(set(test_data))
             for c in core_column:
                 value_set = [item[c] for item in test_data]
                 for con in constraintion:
@@ -236,7 +233,7 @@ def insert_test_data_single(schema_sqls, num_rows): # 目前实现的这个版�
                             row[column_name] = generated_value
                             
                     test_data.append(row)  
-        print("---------------test_data--------------\n",test_data)
+        # print("---------------test_data--------------\n",test_data)
         connect_insert_data(table_name, columns, test_data)
 
                   
